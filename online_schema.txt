@@ -1,0 +1,54 @@
+//online schema
+CREATE TABLE `compexams` (
+  `eid` int NOT NULL,
+  `ename` varchar(15) DEFAULT NULL,
+  `cid` int DEFAULT NULL,
+  `time` int DEFAULT NULL,
+  PRIMARY KEY (`eid`),
+ 
+   FOREIGN KEY (`cid`) REFERENCES `courses` (`cid`)
+)
+
+CREATE TABLE `teachers` (
+  `tid` varchar(30) NOT NULL,
+  `password` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`tid`)
+)  
+CREATE TABLE `students` (
+  `sid` varchar(30) NOT NULL,
+  `password` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`sid`)
+) 
+CREATE TABLE `exams` (
+  `eid` int NOT NULL AUTO_INCREMENT,
+  `ename` varchar(10) DEFAULT NULL,
+  `cid` int DEFAULT NULL,
+  `time` int DEFAULT NULL,
+  PRIMARY KEY (`eid`),
+  UNIQUE KEY `cid` (`cid`,`ename`),
+   FOREIGN KEY (`cid`) REFERENCES `courses` (`cid`),
+  CONSTRAINT `tt` CHECK ((`time` > 0))
+) 
+CREATE TABLE `enroll` (
+  `cid` int NOT NULL,
+  `sid` varchar(20) NOT NULL,
+  PRIMARY KEY (`cid`,`sid`),
+  KEY `sid` (`sid`),
+  CONSTRAINT `enroll_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `courses` (`cid`),
+  CONSTRAINT `enroll_ibfk_2` FOREIGN KEY (`sid`) REFERENCES `students` (`sid`)
+)
+CREATE TABLE `courses` (
+  `cid` int NOT NULL AUTO_INCREMENT,
+  `tid` varchar(20) DEFAULT NULL,
+  `classname` varchar(20) DEFAULT NULL,
+  `subject` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`cid`),
+  UNIQUE KEY `classname` (`classname`,`subject`),
+  KEY `tid` (`tid`),
+   FOREIGN KEY (`tid`) REFERENCES `teachers` (`tid`)
+)  
+
+
+CREATE VIEW `enrolllist` AS 
+select `courses`.`cid` AS `cid`,`courses`.`classname` AS `classname`,`courses`.`subject` AS `subject`,`enroll`.`sid` AS `sid` 
+from (`enroll` join `courses` on((`courses`.`cid` = `enroll`.`cid`)))
